@@ -1,62 +1,54 @@
+import sys
+
 user_input = input("Введите выражение: ")
 common_expr = user_input.split()
 expr = []
 
 for i in common_expr:
-    temporary_list = []
-    if i.lstrip('-').isdigit():
+    if i.isdigit() or (i[0] == '-' and i[1:].isdigit()):
         expr.append(int(i))
-    elif i.lstrip('(').isdigit() or i.rstrip(')').isdigit():
-        if i == '(' or i == ')':
-            expr.append(i)
-        if len(i) > 1:
-            if i[0] == '(':
-                for item in i:
-                    if item == "(":
-                        expr.append('(')
-                expr.append(int(i.lstrip('(')))
-            elif i[-1] == ')':
-                expr.append(int(i.rstrip(')')))
-                for item in i:
-                    if item == ")":
-                        expr.append(')')
-
-    elif i == "+" or i == "-" or i == "*" or i == "/" or i =='(' or i == ')':
+    elif i in '+-*/()': 
         expr.append(i)
+    else:
+        print(f"Неизвестный токен: {i}")
 
                                                   
 def summ(act_index, list_expr):
     left = list_expr[act_index-1]
     right = list_expr[act_index+1]   
     list_expr[act_index+1] = left + right
-    del list_expr[act_index]
-    del list_expr[list_expr.index(left)]
+    del list_expr[act_index - 1]
+    del list_expr[act_index - 1]
 
 def diff(act_index, list_expr):
     left = list_expr[act_index-1]
     right = list_expr[act_index+1]
     list_expr[act_index+1] = left - right
-    del list_expr[act_index]
-    del list_expr[list_expr.index(left)]
+    del list_expr[act_index - 1]
+    del list_expr[act_index - 1]
 
 def mult(act_index, list_expr):
     left = list_expr[act_index-1]
     right = list_expr[act_index+1]
     list_expr[act_index+1] = left * right
-    del list_expr[act_index]
-    del list_expr[list_expr.index(left)]
+    del list_expr[act_index - 1]
+    del list_expr[act_index - 1]
 
 def div(act_index, list_expr):
     left = list_expr[act_index-1]
     right = list_expr[act_index+1]
-    list_expr[act_index+1] = left / right
-    del list_expr[act_index]
-    del list_expr[list_expr.index(left)]
+    if right == 0:
+        print("Ошибка: деление на ноль")
+        sys.exit()
+    else:
+        list_expr[act_index+1] = left / right
+        del list_expr[act_index - 1]
+        del list_expr[act_index - 1]
 
 
 def operation(expr):
     if len(expr) == 1:
-        if type(expr[0]) == int or float:
+        if type(expr[0]) == int or type(expr[0]) == float:
             return expr[0] 
         else:
             return "Ошибка: одиночный оператор"
@@ -81,7 +73,6 @@ def operation(expr):
             elif item == "-":
                 diff(expr.index(item), expr)
                 return operation(expr)
-    return "Ошибка: нет операторов"
 
 def brace_operation(expr):
     brace_dict = {}
@@ -168,7 +159,6 @@ def brace_operation(expr):
         newExpr.insert(brace_dict[open_brace]['index'] , operation(temporary_list))
 
         brace_open_index = brace_dict[open_brace]['index']
-        brace_close_index = brace_dict[close_brace]['index']
 
         temporary_counter = 0
         while temporary_counter  < 2:
@@ -210,6 +200,12 @@ def inspection(expr):
                 print("Ошибка несоответствие скобок")
             else:
                 brece_list.pop()
+
+    if brace_exist:
+        for braceItem in range(len(expr)):
+            if expr[braceItem] == "(" and expr[braceItem + 1] == ")":
+                print("Ошибка: пустые скобки")
+                sys.exit()
     
     if brace_exist == False:
         print("Ответ:" , operation(expr))   
@@ -218,6 +214,11 @@ def inspection(expr):
     else: 
         print("Ошибка несоответствие скобок")
 
+print("Правила ввода:" \
+     "Вводить всё только через пробелы , любой символ должке быть отделен от другого пробелом;" \
+     "Деление на ноль запрещено;" \
+     "Выражения должны быть написаны грамтно , пример не правильного ввода: + + -19 / 1 ) " \
+     "Пример правильного ввода: 7 * ( ( 10 + 2 ) - ( 2 * 6 ) )")
 inspection(expr)
 
 
