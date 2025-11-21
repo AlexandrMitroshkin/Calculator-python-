@@ -9,8 +9,7 @@ for i in common_expr:
         expr.append(int(i))
     elif i in '+-*/()': 
         expr.append(i)
-    else:
-        print(f"Неизвестный токен: {i}")
+
 
                                                   
 def summ(act_index, list_expr):
@@ -196,16 +195,26 @@ def inspection(expr):
             brace_exist = True
             brece_list.append(expr[i])
         if expr[i] == ")":
+            brace_exist = True
             if len(brece_list) == 0:
                 print("Ошибка несоответствие скобок")
+                sys.exit()
             else:
                 brece_list.pop()
+         
+    if brace_exist and len(brece_list) != 0:
+        print("Ошибка: несоответствие скобок")
+        sys.exit()
 
     if brace_exist:
-        for braceItem in range(len(expr)):
+        for braceItem in range(len(expr) - 1):
             if expr[braceItem] == "(" and expr[braceItem + 1] == ")":
                 print("Ошибка: пустые скобки")
                 sys.exit()
+        
+        if "(" in expr and ")" not in expr or ")" in expr and "(" not in expr:
+            print("Ошибка несоответствие скобок")
+            sys.exit()
     
     if brace_exist == False:
         print("Ответ:" , operation(expr))   
@@ -214,12 +223,18 @@ def inspection(expr):
     else: 
         print("Ошибка несоответствие скобок")
 
+    print(brece_list)
+
 print("Правила ввода:" \
      "Вводить всё только через пробелы , любой символ должке быть отделен от другого пробелом;" \
      "Деление на ноль запрещено;" \
      "Выражения должны быть написаны грамтно , пример не правильного ввода: + + -19 / 1 ) " \
      "Пример правильного ввода: 7 * ( ( 10 + 2 ) - ( 2 * 6 ) )")
+
 inspection(expr)
+
+
+
 
 
 
